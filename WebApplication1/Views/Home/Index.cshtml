@@ -1,0 +1,136 @@
+﻿
+<div class="row">
+    <div class="col-md-8">
+        <h2>Getting started</h2>
+       <table class="table table-bordered" id="tble">
+           <thead>
+               <tr>
+                   <td>Name</td>
+                   <td>Email</td>
+                   <td>Mobile</td>
+               </tr>
+           </thead>
+           <tbody id="tbody"></tbody>
+       </table>
+    </div>
+    <div class="col-md-8">
+        <div class="form-group">
+            <input type="hidden" id="Id" class="form-control" />
+            <label class="control-label">Name</label>
+            <input type="text" id="Name" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label class="control-label">Email</label>
+            <input type="text" id="Email" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label class="control-label">MobileNo</label>
+            <input type="text" id="Mobile" class="form-control" />
+        </div>
+        <div class="form-group">
+           
+            <input type="button" value="Save" id="btnSave" onclick="Save()" class="btn btn-primary" />
+            <input type="button" value="Update" id="btnUpdate" onclick="Update()" class="btn btn-primary" />
+        </div>
+    </div>
+    
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            load();
+        })
+        function load() {
+            $.ajax({
+                url: "/api/InstituteInfoes",
+                type: "JSON",
+                method: "GET",
+                success: function (data) {
+
+                    var html = "";
+                    $.each(data, function (i, v) {
+                        //  console.log(v.Name)
+                        $("#tble tbody").empty();
+                        html += "<tr><td>" + v.Name + "</td>"
+                            + "<td>" + v.Email + "</td>"
+                            + "<td>" + v.MobileNo + "</td>"
+                            + "<td><button onClick='EditData(" + v.Id + ")'>Edit </button>|| <button>Delete </button>  </td></tr>"
+                        $("#tble tbody").append(html);
+                    })
+                }
+
+            })
+        }
+        function EditData(id) {
+            $.ajax({
+                url: "/api/InstituteInfoes/" + id,
+                type: "JSON",
+                method: "GET",
+                success: function (data) {
+                    $("#Name").val(data.Name)
+                    $("#Email").val(data.Email)
+                    $("#Mobile").val(data.MobileNo)
+                    $("#Id").val(data.Id)
+                }
+
+            })
+        }
+
+        function Update() {
+            var obj = {
+                Name: $("#Name").val(),
+                Email: $("#Email").val(),
+                MobileNo: $("#Mobile").val(),
+                Id: $("#Id").val()
+            }
+            $.ajax({
+                url: "/api/InstituteInfoes/" + $("#Id").val(),
+                type: "JSON",
+                method: "PUT",
+                data: obj,
+                success: function (data) {
+
+                    load();
+                    clearall();
+                }, error: function (e) {
+                    console.log(e.responseText)
+                }
+
+            })
+        }
+
+        function Save() {
+            var obj = {
+                Name: $("#Name").val(),
+                Email: $("#Email").val(),
+                MobileNo: $("#Mobile").val()
+                
+            }
+            $.ajax({
+                url: "/api/InstituteInfoes/" ,
+                type: "JSON",
+                method: "POST",
+                data: obj,
+                success: function (data) {
+                    if (data.Id > 0) {
+                        load();
+                        clearall();
+                    }
+                    
+                    
+                },
+                error: function (e) {
+                    console.log(e.responseText)
+                }
+
+            })
+        }
+        function clearall() {
+            $("#Name").val('')
+            $("#Email").val('')
+            $("#Mobile").val('')
+            $("#Id").val('')
+        }
+    </script>
+    
+    }
